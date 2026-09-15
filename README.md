@@ -1,49 +1,27 @@
 # skills
 
-[English](./README.md) | [中文](./docs/README.zh-CN.md)
+面向 AI Agent 的技能库。每个技能是 `skills/` 下的一个自包含目录，以 `SKILL.md` 为入口，可附带 `references/` 与 `templates/`。
 
-A collection of agent skills. Each skill is a self-contained directory under
-`skills/` with a `SKILL.md` entry point plus optional `references/` and
-`templates/`.
-
-## Quick Start
-
-Install a skill with the [Skills CLI](https://skills.sh):
+## 安装
 
 ```bash
-# Interactive picker: choose skills and target agents
 npx skills@latest add elliot-zen/skills
-
-# Install a specific skill
-npx skills@latest add elliot-zen/skills --skill write-spec
-
-# Install globally for a specific agent
-npx skills@latest add elliot-zen/skills --skill write-spec -g -a claude-code
 ```
 
-Installed skills
-are picked up automatically by your agent; restart the agent if it was
-already running.
+安装后重启 Agent 即可自动生效。
 
-
-## Available skills
+## 技能列表
 
 ### write-spec
 
-Write and maintain reproducible specifications for AI agents. The goal is that a
-new agent with no chat history or author context can reproduce semantically
-equivalent behavior from the repository and the spec alone.
+编写和维护面向 AI Agent 的可复现规格文档（Spec）。核心理念：一个没有聊天记录的新 Agent，仅凭仓库和 Spec 就能复现语义等价的功能。
 
-1. Read the project documentation guide, then the existing spec for the
-   affected `<id>` before touching code.
-2. Keep three documents per feature under `docs/biz/<id>/`: `product.md`
-   (external behavior), `tech.md` (implementation constraints), and
-   `history.md` (why the spec changed). Cross-cutting contracts shared by
-   multiple features (error handling, HTTP conventions, auth, logging, …) are
-   extracted to `docs/common/<id>/` once a second consumer appears, and the
-   feature specs link to them instead of restating them.
-3. Only start implementation after the spec is updated and validated.
+每个功能在 `docs/biz/<id>/` 下维护三份文档：
 
-See `skills/write-spec/SKILL.md` for the full workflow,
-`skills/write-spec/references/` for the rules, and
-`skills/write-spec/templates/` for the document templates.
+- `product.md`：系统对外表现
+- `tech.md`：内部实现约束
+- `history.md`：重要规格变化及原因
+
+跨业务共享的契约（错误处理、HTTP 约定、认证、日志等）提取到 `docs/biz/common/<id>/`，业务 Spec 只链接不复述。
+
+完整流程见 `skills/write-spec/SKILL.md`。
