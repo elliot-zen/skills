@@ -24,12 +24,14 @@ docs/
 │   └── <id>/
 │       ├── product.md
 │       ├── tech.md
-│       └── history.md
+│       ├── history.md
+│       └── references/      # 本 Spec 所依赖的外部接口快照（按需）
 └── biz/
     └── <id>/
         ├── product.md       # 系统对外表现
         ├── tech.md          # 内部实现约束
-        └── history.md       # 重要规格变化及原因
+        ├── history.md       # 重要规格变化及原因
+        └── references/      # 本 Spec 所依赖的外部接口快照（按需）
 ```
 
 `biz/` 与 `common/` 使用相同的三文档结构。管理跨业务复用的公共事实（统一错误处理、HTTP 约定、认证、日志等）见 `references/document-model.md`。
@@ -37,7 +39,7 @@ docs/
 ## 工作流程
 
 1. 读取 `docs/documentation-guide.md`（若存在），确定业务 `<id>` 与 Scope。
-2. 读取现有 `product.md`、`tech.md`、`history.md`（含相关 `docs/common/` 公共 Spec），以及仓库中相关的设计文档。
+2. 读取现有 `product.md`、`tech.md`、`history.md`（含相关 `docs/common/` 公共 Spec），以及仓库中相关的设计文档。若实现依赖外部接口文档，提取复现所需的接口内容，保存到该 Spec 目录的 `references/`，并记录来源 URL、版本或获取日期及定位信息。
 3. 将收集到的事实分类：Product Facts / Technical Facts / History / Unknown。
 4. 识别公共事实：已存在于公共 Spec 的改为链接；未存在但被复用或属于项目级约定的提取到 `docs/common/`。
 5. 更新 `product.md`。
@@ -63,5 +65,6 @@ docs/
 - 同一事实只定义一次。跨业务复用的公共契约放入 `docs/common/`，业务 Spec 只链接不复述。
 - 只写当前事实。决策过程、方案比较、TODO、开发进度一律不写，完整历史交给 Git。
 - 对复现无用的事实不写，缺失会导致猜测的事实必写。
+- 外部接口文档是实现依赖时，必须将复现所需的接口定义保存到对应 Spec 的 `references/`，并由 `tech.md` 链接该本地文件。快照只保留所需接口、字段、错误和约束，注明原始 URL、版本或获取日期及相关章节/操作；不能只引用会变化的外部页面。无法确认的接口约束标为 Unknown，不将其推断为确定事实。
 - Unknown 不得写成确定事实。
 - 代码与 Spec 冲突时，先判断是实现偏离 Spec 还是 Spec 错误，不默认以代码为准。
