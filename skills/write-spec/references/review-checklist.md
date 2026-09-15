@@ -4,7 +4,7 @@
 
 ## 结构
 
-- [ ] 使用 `docs/biz/<id>/` 或 `docs/common/<id>/`，`<id>` 简短、稳定、按业务概念命名
+- [ ] 使用 `docs/biz/<id>/` 或 `docs/biz/common/<id>/`，`<id>` 简短、稳定、按业务概念命名
 - [ ] `product.md`、`tech.md` 存在，需要时 `history.md` 存在
 - [ ] 一个 Spec 只覆盖一个相对独立的业务能力，未堆成巨型 Spec
 
@@ -23,7 +23,7 @@
 
 ## 公共事实
 
-- [ ] 跨业务复用的公共契约（错误处理、HTTP 约定、认证、日志等）已提取到 `docs/common/`，未在多个 Spec 中重复定义
+- [ ] 跨业务复用的公共契约（错误处理、HTTP 约定、认证、日志等）已提取到 `docs/biz/common/`，未在多个 Spec 中重复定义
 - [ ] 业务 Spec 通过链接引用公共 Spec，未复制其契约
 - [ ] 业务偏离公共约定处已显式声明例外及差异
 - [ ] 公共 Spec 与业务 Spec 无冲突

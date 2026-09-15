@@ -5,13 +5,13 @@
 ```text
 docs/
 ├── documentation-guide.md   # 项目级文档规范（若存在）
-├── common/
-│   └── <id>/
-│       ├── product.md
-│       ├── tech.md
-│       ├── history.md
-│       └── references/      # 本 Spec 所依赖的外部接口快照（按需）
 └── biz/
+    ├── common/              # 跨业务共享的契约与约定
+    │   └── <id>/
+    │       ├── product.md
+    │       ├── tech.md
+    │       ├── history.md
+    │       └── references/  # 公共接口快照（按需）
     └── <id>/
         ├── product.md
         ├── tech.md
@@ -56,7 +56,7 @@ Task Definition 以 PostgreSQL 为准 → tech.md
 
 ## 复用仓库已有设计文档
 
-写 `tech.md` 前，先在仓库中查找文档索引、架构总览、权威设计文档和 `docs/common/` 公共 Spec。`tech.md` 是实现入口，不是这些文档的替代品：
+写 `tech.md` 前，先在仓库中查找文档索引、架构总览、权威设计文档和 `docs/biz/common/` 公共 Spec。`tech.md` 是实现入口，不是这些文档的替代品：
 
 - 链接实现所需的仓库设计文档和公共 Spec，说明其负责的主题以及本 Spec 如何使用。
 - 不在 `tech.md` 复制这些文档已有的契约、算法、Schema 或长篇解释。
@@ -70,12 +70,12 @@ Task Definition 以 PostgreSQL 为准 → tech.md
 - 保存所需接口的方法、路径、鉴权方式、请求与响应字段（类型、必填性、默认值及约束）、错误语义，以及实际依赖的分页、事件、重试等协议规则。保留理解这些接口必需的公共定义和最小示例，不下载整站或无关接口。
 - 文件注明文档名称、原始 URL、获取日期、相关章节/操作；来源提供版本时一并记录。示例中的真实凭据应脱敏。
 - 本地文件保存外部接口契约，`tech.md` 说明本系统如何使用它及字段/错误映射，不重复抄写接口定义。
-- 同一接口被多个业务复用时，按公共事实规则将快照归入对应 `docs/common/<id>/references/`，消费者通过链接复用。
+- 同一接口被多个业务复用时，按公共事实规则将快照归入对应 `docs/biz/common/<id>/references/`，消费者通过链接复用。
 - 文档无法访问或必要定义缺失时，请用户提供文档内容或导出文件；未确认部分保留为 Unknown，并在交付时说明可复现性缺口，不能凭接口名称或常见实践补齐。
 
 本地快照是当前 Spec 依赖的接口依据，原始链接用于追溯。依赖契约变化时同步更新快照与相关 Spec，旧内容由 Git 保存。
 
-## 公共 Spec（docs/common/）
+## 公共 Spec（docs/biz/common/）
 
 放置跨业务共享的契约与约定：统一错误处理、HTTP/协议约定、认证与鉴权、日志与追踪、ID 生成、配置与开关等。使用与业务 Spec 相同的 product/tech/history 结构；纯内部约定可让 `product.md` 写「不适用」。
 
