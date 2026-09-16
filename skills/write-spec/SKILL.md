@@ -1,70 +1,78 @@
 ---
 name: write-spec
-description: 编写和维护面向 AI Agent 的可复现规格文档。在创建或修改功能、行为或缺陷修复前使用.
+description: 编写、审查和维护可由新 Agent 复现的产品与技术规格。用于新功能、行为变更和缺陷修复涉及正式事实时。
 ---
 
 # Write Spec
 
 ## 目标
 
-Spec 描述系统当前成立的事实，不描述开发过程。
+`product.md` 和 `tech.md` 是当前事实源。交付标准不是章节齐全，而是：删除讨论、计划和旧上下文后，新 Agent 仍能实现语义等价的功能，并且无需猜测关键规则。
 
-唯一验收标准：
+## 工作方法
 
-> 一个未参与前序讨论的新 Agent，只拥有仓库和 Spec，能否复现语义等价的功能？
+### 1. 建立事实账本
 
-语义等价指产品行为、状态、API、错误、数据约束、关键技术约束一致，不要求代码相同。
-
-## 文档结构
+先读取项目文档索引、现有 Spec、设计文档、用户确认、实现、配置、接口定义和测试。逐条记录相关事实，至少包含：
 
 ```text
-docs/
-├── documentation-guide.md   # 项目级文档规范（若存在）
-└── biz/
-    ├── common/              # 跨业务共享的契约与约定
-    │   └── <id>/
-    │       ├── product.md
-    │       ├── tech.md
-    │       ├── history.md
-    │       └── references/  # 公共接口快照（按需）
-    └── <id>/
-        ├── product.md       # 系统对外表现
-        ├── tech.md          # 内部实现约束
-        ├── history.md       # 重要规格变化及原因
-        └── references/      # 本 Spec 所依赖的外部接口快照（按需）
+来源 | 事实 | Product/Tech | 当前/历史/Unknown | 最终位置或处理理由
 ```
 
-业务 Spec（`docs/biz/<id>/`）与公共 Spec（`docs/biz/common/<id>/`）使用相同的三文档结构。管理跨业务复用的公共事实（统一错误处理、HTTP 约定、认证、日志等）见 `references/document-model.md`。
+不要先把来源压缩成摘要。事实账本是工作材料，不进入正式 Spec；但每条已确认事实必须写入、链接到唯一事实源，或明确说明已失效/不适用。
 
-## 工作流程
+### 2. 建立行为模型
 
-1. 读取 `docs/documentation-guide.md`（若存在），确定业务 `<id>` 与 Scope。
-2. 读取现有 `product.md`、`tech.md`、`history.md`（含相关 `docs/biz/common/` 公共 Spec），以及仓库中相关的设计文档。若实现依赖外部接口文档，提取复现所需的接口内容，保存到该 Spec 目录的 `references/`，并记录来源 URL、版本或获取日期及定位信息。
-3. 将收集到的事实分类：Product Facts / Technical Facts / History / Unknown。
-4. 识别公共事实：已存在于公共 Spec 的改为链接；未存在但被复用或属于项目级约定的提取到 `docs/biz/common/`。
-5. 更新 `product.md`。
-6. 更新 `tech.md`。
-7. 仅在存在重要规格变化时更新 `history.md`。
-8. 按 `references/review-checklist.md` 做可复现性检查。
-9. 确认 Spec 与最终实现一致。
+对每个公开入口、后台触发器或跨组件流程，回答：
 
-未确认现有 Spec（含公共 Spec）是否已拥有该行为前，不要新建 Spec。
+```text
+谁在什么条件下触发
+→ 前置校验与权限
+→ 主要流程与关键顺序
+→ 数据变化和外部副作用
+→ 成功结果
+→ 失败、重复、并发、超时和恢复
+```
 
-## 参考文件
+只展开适用项。没有状态模型时不虚构状态机；存在状态时必须写完整转换。
 
-| 时机 | 文件 |
-| --- | --- |
-| 开始前 | `references/principles.md`、`references/document-model.md` |
-| 判断具体写法 | `references/writing-rules.md` |
-| 完成后 | `references/review-checklist.md` |
-| 新建文档 | `templates/product.md`、`templates/tech.md`、`templates/history.md` |
+按需求类型补充检查：
 
-## 核心约束
+- CRUD：字段、权限、校验、唯一性、修改、删除、并发修改；
+- 查询：可见范围、过滤、排序、分页、默认值、空结果；
+- 配置：作用域、默认值、合法值、生效时机、动态变更和兼容性；
+- 流程/异步任务：触发、排队、顺序、状态、副作用、失败、超时、恢复；
+- 外部集成：协议映射、认证、错误、Retry、Timeout、幂等、降级。
 
-- `product.md` 写系统对外是什么，`tech.md` 写内部必须满足什么，`history.md` 写重要变化为什么发生。
-- 同一事实只定义一次。跨业务复用的公共契约放入 `docs/biz/common/`，业务 Spec 只链接不复述。
-- 只写当前事实。决策过程、方案比较、TODO、开发进度一律不写，完整历史交给 Git。
-- 对复现无用的事实不写，缺失会导致猜测的事实必写。
-- 外部接口文档是实现依赖时，必须将复现所需的接口定义保存到对应 Spec 的 `references/`，并由 `tech.md` 链接该本地文件。快照只保留所需接口、字段、错误和约束，注明原始 URL、版本或获取日期及相关章节/操作；不能只引用会变化的外部页面。无法确认的接口约束标为 Unknown，不将其推断为确定事实。
-- Unknown 不得写成确定事实。
-- 代码与 Spec 冲突时，先判断是实现偏离 Spec 还是 Spec 错误，不默认以代码为准。
+### 3. 归属事实
+
+- `product.md`：调用方、用户或其他系统可观察的能力和行为。
+- `tech.md`：为实现这些行为必须满足的组件边界、数据、协议、一致性和运行约束。
+- 两者都需要时分别描述语义和实现约束，不因“单一事实来源”而漏写一层。
+- 公共契约只在公共 Spec 完整定义，业务 Spec 链接并说明适用范围和例外。
+- 决策过程写入 `history.md`；当前约束写入 `product.md` / `tech.md`。
+
+### 4. 写作与审查
+
+先更新 `product.md`，再更新 `tech.md`，必要时更新 `history.md`。不把会影响结果、副作用、一致性或恢复的运行顺序误删为“实现步骤”。
+
+完成后执行 [review-checklist.md](references/review-checklist.md)。Review 必须引用具体规则位置，不能只检查标题存在。覆盖审计失败、存在未解释冲突或关键行为仍需猜测时，不得视为完成。
+
+## 文档布局
+
+```text
+docs/biz/<id>/
+├── product.md
+├── tech.md
+├── history.md       # 仅在有重要规格变化时
+└── references/      # 外部接口的本地最小快照
+```
+
+开始前读取 `docs/documentation-guide.md`（若存在）以及 [document-model.md](references/document-model.md)。写作规则见 [writing-rules.md](references/writing-rules.md)，模板位于 `templates/`。
+
+## 硬性约束
+
+- 只写当前事实；Unknown 保持 Unknown，不得自行补全。
+- 保留所有影响行为、数据、副作用、权限、一致性、恢复或兼容性的事实；只删除不会导致猜测的重复内容。
+- 外部接口依赖必须保存到 `references/`，包含来源、版本/日期、字段、错误和本系统实际使用的约束。
+- Spec、实现、配置、接口和测试冲突时，先定位事实所有者并解决冲突；未解决不得交付。
