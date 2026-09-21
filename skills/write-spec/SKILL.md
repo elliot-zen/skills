@@ -9,13 +9,36 @@ description: 根据项目 Spec 索引新增或更新产品与技术规格，并�
 
 产出完整、一致且可实施的 PRODUCT 与 TECH。新 Agent 只阅读项目和这两份文档，就应能理解产品行为、关键设计、实现方式与验证要求，无需依赖历史对话或自行猜测。
 
-下文使用 PRODUCT 和 TECH 表示两类文档。实际文件名、大小写和目录以项目 Spec 索引为准；项目没有约定时，默认使用 `docs/biz/<id>/product.md` 和 `docs/biz/<id>/tech.md`。
+下文使用 PRODUCT 和 TECH 表示两类文档；实际文件名固定为小写 `product.md` 和 `tech.md`。
+
+## Spec 目录结构
+
+```text
+docs/
+├── documentation-guide.md       # Spec 索引
+└── biz/
+    ├── common/                  # 跨业务共享 Spec
+    │   └── <spec-id>/
+    │       ├── product.md
+    │       └── tech.md
+    └── <spec-id>/               # 单一业务 Spec
+        ├── product.md
+        └── tech.md
+```
+
+目录规则：
+
+- `docs/documentation-guide.md` 是 Spec 索引；每个 Spec 必须在其中登记，并链接到对应的 `product.md` 和 `tech.md`。
+- 单一业务能力放在 `docs/biz/<spec-id>/`；跨业务共享能力放在 `docs/biz/common/<spec-id>/`。
+- 一个 `<spec-id>` 目录表示一个完整 Spec，必须同时包含 `product.md` 和 `tech.md`，不得将两者拆到不同目录。
+- `<spec-id>` 使用简短、稳定、表达业务能力的 kebab-case 名称；不得使用任务编号、日期或临时方案名。
+- 不得在 `docs/biz/`、`docs/biz/common/` 或其他位置创建同一能力的平行 Spec。
 
 ## 流程
 
 ### 1. 根据 Spec 索引定位
 
-先读取项目的 Spec 索引，例如 `docs/documentation-guide.md`，再按业务能力定位文档：
+先读取 `docs/documentation-guide.md`，再按业务能力定位文档：
 
 - 找到对应 Spec：直接更新索引指向的 PRODUCT 和 TECH，不创建同主题的第二份 Spec。
 - 没有对应 Spec：创建 PRODUCT 和 TECH，并在同一次变更中加入 Spec 索引。
@@ -30,7 +53,7 @@ description: 根据项目 Spec 索引新增或更新产品与技术规格，并�
 - 被两个或更多业务模块共同使用；或
 - 属于适用于全项目或大多数业务的公共能力。
 
-满足任一条件时，将完整 Spec 放到或移动到索引约定的 `biz/common/<id>/`；默认位置为 `docs/biz/common/<id>/`。同时更新 Spec 索引和所有旧引用，并删除原业务目录中的重复定义。
+满足任一条件时，将完整 Spec 放到或移动到 `docs/biz/common/<spec-id>/`。同时更新 Spec 索引和所有旧引用，并删除原业务目录中的重复定义。
 
 不满足时保留在对应业务目录，不为可能的未来复用提前抽象。业务模块使用公共能力时只引用公共 Spec；存在业务例外时，仅在业务 Spec 中描述差异。
 
