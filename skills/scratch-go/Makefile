@@ -12,7 +12,7 @@ VERSION ?= dev
 TOOLS_DIR = .tools/$(shell "$(GO)" env GOVERSION)
 STATICCHECK := $(TOOLS_DIR)/staticcheck-$(STATICCHECK_VERSION)/staticcheck
 
-.PHONY: build run test check fmt
+.PHONY: build run dev test check fmt
 
 # Shared prerequisite checks, expanded only when a public target runs.
 define guard
@@ -27,6 +27,15 @@ build:
 
 run: build
 	'./bin/$(SERVICE)'
+
+dev: build
+	@set -e; \
+	if [ -f .env ]; then \
+	  set -a; \
+	  . ./.env; \
+	  set +a; \
+	fi; \
+	exec './bin/$(SERVICE)'
 
 test:
 	$(guard)
