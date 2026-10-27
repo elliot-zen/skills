@@ -1,5 +1,5 @@
 ---
-name: go-backend
+name: scratch-go
 description: 指导 Go 后端项目的初始化、功能开发、缺陷修复、重构与代码审查，覆盖组织结构、错误处理、结构化日志、并发与资源管理、HTTP/Gin 服务和自动化验证；已有工程优先遵守其约定。
 ---
 
@@ -135,7 +135,7 @@ Go 版本要求只维护在 `go.mod`：`go` 指令声明最低版本，`toolchai
 | `internal/httpapi/` | 使用 HTTP/Gin 时放置路由、适配、中间件及其测试 |
 | `go.mod`、`go.sum` | 单 Module 及固定依赖 |
 | `Makefile` | 复制本技能同目录模板，作为工程执行入口 |
-| `.agents/skills/go-backend/` | 保存本手册及 Makefile 模板，供项目内持续引用 |
+| `.agents/skills/scratch-go/` | 保存本手册及 Makefile 模板，供项目内持续引用 |
 | `AGENTS.md` | 后续开发约束入口 |
 | `README.md` | 环境、版本、配置、接口与 Makefile 目标说明 |
 | `.gitignore` | 忽略 `/bin/`、`/.tools/`、`/coverage.out`、本地秘密文件；保留 `go.sum` |
@@ -149,7 +149,7 @@ Go 版本要求只维护在 `go.mod`：`go` 指令声明最低版本，`toolchai
 ```markdown
 ## Go 开发约定
 
-修改 Go 代码前，阅读 `.agents/skills/go-backend/SKILL.md` 第 1、2、5 章；涉及 HTTP/Gin 服务时同时遵守第 3 章。
+修改 Go 代码前，阅读 `.agents/skills/scratch-go/SKILL.md` 第 1、2、5 章；涉及 HTTP/Gin 服务时同时遵守第 3 章。
 仅在初始化工程时执行第 4 章。检查命令以工程根目录 Makefile 为准。
 ```
 
