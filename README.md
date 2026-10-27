@@ -25,3 +25,12 @@ npx skills@latest add elliot-zen/skills
 跨业务共享的契约（错误处理、HTTP 约定、认证、日志等）提取到 `docs/biz/common/<id>/`，业务 Spec 只链接不复述。
 
 完整流程见 `skills/write-spec/SKILL.md`。
+
+### scratch-go
+
+指导 Go 后端项目的初始化、功能开发、缺陷修复、重构与代码审查，涵盖错误处理、结构化日志、并发与资源管理、HTTP/Gin 服务和自动化验证。
+
+- 开发指南：[skills/scratch-go/SKILL.md](skills/scratch-go/SKILL.md)
+- 工程 Makefile 模板：[skills/scratch-go/Makefile](skills/scratch-go/Makefile)
+
+本技能由 `elliot-zen/scratch-go` 迁入（源提交 `b6a70e1da2379580708916aa49c87ba53eddb18d`），技能名称为 `go-backend`。
