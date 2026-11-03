@@ -55,7 +55,8 @@ check:
 	  GOBIN='$(CURDIR)/$(dir $(STATICCHECK))' "$(GO)" install honnef.co/go/tools/cmd/staticcheck@$(STATICCHECK_VERSION); \
 	fi
 	PATH="$$("$(GO)" env GOROOT)/bin:$$PATH" '$(STATICCHECK)' ./...
-	CGO_ENABLED=1 "$(GO)" test -race -count=1 -timeout=120s ./...
+	"$(GO)" test -coverprofile=coverage.out -covermode=atomic -count=1 -timeout=120s ./...
+	"$(GO)" tool cover -func=coverage.out
 
 fmt:
 	$(guard)

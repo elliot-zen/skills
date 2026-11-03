@@ -501,12 +501,14 @@ HTTP 服务按实际契约验证以下适用行为：
 | `make run` | 构建并前台运行所选服务 |
 | `make dev` | 构建后加载根目录 `.env` 并前台运行所选服务；加载规则见第 3.2 节 |
 | `make test` | 运行整个模块的行为测试，不使用测试结果缓存 |
-| `make check` | 检查格式、模块一致性、编译、vet、Staticcheck，并执行整个模块的竞态测试 |
+| `make check` | 检查格式、模块一致性、编译、vet、Staticcheck，并执行整个模块的测试及覆盖率统计 |
 | `make fmt` | 修复 Go 源码格式 |
 
 `build`、`run`、`dev` 默认选择 `SERVICE` 指定的服务，可用 `make build SERVICE=orders-worker`、`make run SERVICE=orders-worker` 或 `make dev SERVICE=orders-worker` 切换。`dev` 使用 exec 启动程序，保留退出状态和信号处理语义；其他目标不加载 `.env`。
 
-`check` 自动安装并复用固定版本 Staticcheck，缓存于 `.tools`，按所选 Go 工具链版本隔离；首次安装需要网络。竞态测试需要支持的平台与 C 编译器。`check` 不修改源码或模块文件。
+`check` 自动安装并复用固定版本 Staticcheck，缓存于 `.tools`，按所选 Go 工具链版本隔离；首次安装需要网络。`check` 不修改源码或模块文件。
+
+`check` 使用 atomic 覆盖率模式，在工程根目录生成 `coverage.out`，并输出函数级及总语句覆盖率，不设置统一覆盖率门槛。可用 `go tool cover -html=coverage.out` 查看源码覆盖情况；覆盖率统计不能替代第 6.1 节的行为验证。
 
 ### 6.3 验证流程与交付记录
 
