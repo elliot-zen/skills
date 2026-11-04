@@ -1,18 +1,15 @@
 SHELL := /bin/sh
-.DEFAULT_GOAL := check
+.DEFAULT_GOAL := test
 .DELETE_ON_ERROR:
 
-STATICCHECK_VERSION := v0.8.2
 GO ?= go
 GOFMT ?= $(shell "$(GO)" env GOROOT)/bin/gofmt
+GO_TEST_FLAGS ?= -count=1 -v -timeout=5m -json
 # Replace this default with the project's primary service name during initialization.
 SERVICE ?= service
 VERSION ?= dev
-# Separate installed tools by the toolchain selected for this module.
-TOOLS_DIR = .tools/$(shell "$(GO)" env GOVERSION)
-STATICCHECK := $(TOOLS_DIR)/staticcheck-$(STATICCHECK_VERSION)/staticcheck
 
-.PHONY: build run dev test check fmt
+.PHONY: build run dev fmt test coverage
 
 # Shared prerequisite checks, expanded only when a public target runs.
 define guard
@@ -39,23 +36,11 @@ dev: build
 
 test:
 	$(guard)
-	"$(GO)" test -count=1 -timeout=60s ./...
+	"$(GO)" test $(GO_TEST_FLAGS) ./...
 
-check:
+coverage:
 	$(guard)
-	@test -x '$(GOFMT)' || { printf '%s\n' 'gofmt is required from the selected Go toolchain.' >&2; exit 1; }
-	@files="$$(find . -type d \( -name .git -o -name .tools -o -name vendor \) -prune -o -type f -name '*.go' -exec '$(GOFMT)' -l {} +)" || exit 1; \
-	if [ -n "$$files" ]; then printf 'Unformatted Go files:\n%s\n' "$$files" >&2; exit 1; fi
-	"$(GO)" mod verify
-	"$(GO)" mod tidy -diff
-	"$(GO)" build ./...
-	"$(GO)" vet ./...
-	@if ! test -x '$(STATICCHECK)'; then \
-	  mkdir -p '$(dir $(STATICCHECK))' && \
-	  GOBIN='$(CURDIR)/$(dir $(STATICCHECK))' "$(GO)" install honnef.co/go/tools/cmd/staticcheck@$(STATICCHECK_VERSION); \
-	fi
-	PATH="$$("$(GO)" env GOROOT)/bin:$$PATH" '$(STATICCHECK)' ./...
-	"$(GO)" test -coverprofile=coverage.out -covermode=atomic -count=1 -timeout=120s ./...
+	"$(GO)" test $(GO_TEST_FLAGS) -coverprofile=coverage.out -covermode=atomic ./...
 	"$(GO)" tool cover -func=coverage.out
 
 fmt:

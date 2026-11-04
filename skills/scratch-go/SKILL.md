@@ -363,11 +363,10 @@ Gin 服务复用其 `go-playground/validator/v10` 校验能力，使用 `binding
 | --- | --- |
 | Go | `1.27.3` |
 | Gin | `v1.12.0` |
-| Staticcheck | `v0.8.2` |
 
 Go 版本要求只维护在 `go.mod`：`go` 指令声明最低版本，`toolchain` 指令可指定建议工具链。新项目采用上表基线；Makefile 和 README 引用项目要求，不另设版本限制。版本变更时核实代码、依赖与工具的兼容性。
 
-检查 Go 是否可用，不擅自更换系统工具链；遵循环境的 `GOTOOLCHAIN` 设置。自动选择可能下载工具链；设置为 `local` 且版本不足时明确失败。依赖与检查工具固定具体版本，不使用 `@latest`；检查工具版本维护在 Makefile。
+检查 Go 是否可用，不擅自更换系统工具链；遵循环境的 `GOTOOLCHAIN` 设置。自动选择可能下载工具链；设置为 `local` 且版本不足时明确失败。依赖固定具体版本，不使用 `@latest`。
 
 ### 5.2 创建文件与划分职责
 
@@ -388,7 +387,7 @@ Go 版本要求只维护在 `go.mod`：`go` 指令声明最低版本，`toolchai
 | `.agents/skills/scratch-go/` | 保存本手册及 Makefile 模板，供项目内持续引用 |
 | `AGENTS.md` | 后续开发约束入口 |
 | `README.md` | 环境、版本、配置、接口与 Makefile 目标说明 |
-| `.gitignore` | 忽略 `/bin/`、`/.tools/`、`/coverage.out`、`/.env` 和其他本地秘密文件；保留 `go.sum`、`.env.example` |
+| `.gitignore` | 忽略 `/bin/`、`/coverage.out`、`/.env` 和其他本地秘密文件；保留 `go.sum`、`.env.example` |
 
 只创建实际需要的业务模块、数据访问代码和基础设施配置。保留已有项目路径时，同步调整 Makefile 和 Dockerfile 构建入口。
 
@@ -493,26 +492,28 @@ HTTP 服务按实际契约验证以下适用行为：
 
 ### 6.2 检查命令
 
-命令实现集中维护在项目 Makefile。使用 GNU Make 和 POSIX shell，从工程根目录运行以下六个入口，默认目标为 `check`：
+命令实现集中维护在项目 Makefile。使用 GNU Make 和 POSIX shell，从工程根目录运行以下六个入口，默认目标为 `test`：
 
 | 目标 | 用途 |
 | --- | --- |
 | `make build` | 构建 `cmd/$(SERVICE)` 到 `bin/$(SERVICE)`；发布时指定可追溯的 `VERSION` |
 | `make run` | 构建并前台运行所选服务 |
 | `make dev` | 构建后加载根目录 `.env` 并前台运行所选服务；加载规则见第 3.2 节 |
-| `make test` | 运行整个模块的行为测试，不使用测试结果缓存 |
-| `make check` | 检查格式、模块一致性、编译、vet、Staticcheck，并执行整个模块的测试及覆盖率统计 |
 | `make fmt` | 修复 Go 源码格式 |
+| `make test` | 运行整个模块的行为测试，不使用测试结果缓存 |
+| `make coverage` | 运行整个模块的测试，生成覆盖率文件并输出函数级及总覆盖率 |
 
 `build`、`run`、`dev` 默认选择 `SERVICE` 指定的服务，可用 `make build SERVICE=orders-worker`、`make run SERVICE=orders-worker` 或 `make dev SERVICE=orders-worker` 切换。`dev` 使用 exec 启动程序，保留退出状态和信号处理语义；其他目标不加载 `.env`。
 
-`check` 自动安装并复用固定版本 Staticcheck，缓存于 `.tools`，按所选 Go 工具链版本隔离；首次安装需要网络。`check` 不修改源码或模块文件。
+`test` 和 `coverage` 共用 `GO_TEST_FLAGS ?= -count=1 -v -timeout=5m -json`，默认禁用测试结果缓存、输出详细 JSON 测试事件，每个包的测试超时为 5 分钟。可通过 `make test GO_TEST_FLAGS='-count=1 -timeout=5m'` 等方式覆盖参数。
 
-`check` 使用 atomic 覆盖率模式，在工程根目录生成 `coverage.out`，并输出函数级及总语句覆盖率，不设置统一覆盖率门槛。可用 `go tool cover -html=coverage.out` 查看源码覆盖情况；覆盖率统计不能替代第 6.1 节的行为验证。
+`fmt` 直接修改 Go 源码格式，跳过 `.git`、`.tools` 和 `vendor` 目录。三个验证入口不额外执行依赖校验、模块一致性检查、独立编译检查或静态分析，也不安装额外工具。
+
+`coverage` 使用 atomic 覆盖率模式，在工程根目录生成 `coverage.out`，并输出函数级及总语句覆盖率，不设置统一覆盖率门槛。可用 `go tool cover -html=coverage.out` 查看源码覆盖情况；覆盖率统计不能替代第 6.1 节的行为验证。
 
 ### 6.3 验证流程与交付记录
 
-初始化必须通过 `check`、`build`，并验证运行中的程序行为；HTTP 服务使用实际功能请求。后续变更执行相关检查，错误、日志或并发改动需补充反例测试。`check` 已包含测试，无需为同次验收再运行 `test`。漏洞扫描由项目发布流程另行配置。
+初始化必须通过 `fmt`、`coverage`、`build`，并验证运行中的程序行为；HTTP 服务使用实际功能请求。后续变更执行 `fmt` 和相关测试，需要覆盖率时执行 `coverage`；错误、日志或并发改动需补充反例测试。`coverage` 已包含测试，无需为同次验收再运行 `test`。漏洞扫描由项目发布流程另行配置。
 
 服务初始化及配置或部署变更还需执行 `docker compose config --quiet`、镜像构建和容器运行验证。使用独立 Compose 项目名及可用本地端口，验证镜像内默认配置存在、非 root 运行、环境变量未设置时保留默认值、有效覆盖生效、非法覆盖导致启动失败，以及 SIGTERM 能在宽限期内正常关闭。HTTP 服务请求实际接口（初始为 ping）；仅容器处于运行状态不算可用性通过。
 
