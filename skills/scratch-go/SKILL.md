@@ -215,20 +215,11 @@ INFO 的 request、response 各保留前 1024 个 Unicode 字符，按码点计�
 
 ### 4.1 HTTP 契约
 
+新增、修改或审查 HTTP API 时，阅读并遵守 [API 规范](references/api-spec.md)，其中统一定义成功与失败响应、递归 `snake_case` 命名、列表分页及协议例外；本节定义错误转换、请求校验与 HTTP 实现边界。
+
 #### 4.1.1 错误响应与统一出口
 
-由 `internal/httpapi/error_handler.go` 统一识别错误、构造专用响应对象并输出。沿错误链识别第 2.2 节定义的应用错误，输出以下结构，不直接序列化内部错误对象：
-
-```json
-{
-  "code": 409,
-  "reason": "ORDER_ALREADY_PAID",
-  "message": "订单已支付，不能重复付款",
-  "request_id": "<请求标识>"
-}
-```
-
-`code`、`reason`、`message`、`request_id` 必须存在；非空 Metadata 使用 `metadata` 字段输出，空时省略。HTTP 状态码与正文 code 一致，不使用 HTTP 200 承载失败。调用方按状态码处理通用行为、按 reason 判断业务分支。JSON 响应使用 `application/json`，允许 charset；内部 cause、堆栈和包装上下文不进入响应。
+由 `internal/httpapi/error_handler.go` 统一识别错误、构造专用响应对象并按 [API 规范](references/api-spec.md)输出。沿错误链识别第 2.2 节定义的应用错误，映射到响应字段，失败时 `data` 为 `null`；不直接序列化内部错误对象。
 
 常见状态与通用 Reason 如下；有明确业务含义时使用模块定义的 Reason，保持状态语义一致。只有实际引入相应功能时才实现对应业务和鉴权流程：
 
@@ -384,27 +375,27 @@ Go 版本要求只维护在 `go.mod`：`go` 指令声明最低版本，`toolchai
 | `go.mod`、`go.sum` | 单模块及固定依赖 |
 | `Makefile` | 复制本技能同目录模板，作为工程执行入口 |
 | `Dockerfile`、`compose.yaml`、`.dockerignore` | 服务项目按第 5.3 节构建和部署 |
-| `.agents/skills/scratch-go/` | 保存本手册及 Makefile 模板，供项目内持续引用 |
+| `.agents/skills/scratch-go/` | 保存本手册、`references/api-spec.md` 及 Makefile 模板，供项目内持续引用 |
 | `AGENTS.md` | 后续开发约束入口 |
 | `README.md` | 环境、版本、配置、接口与 Makefile 目标说明 |
 | `.gitignore` | 忽略 `/bin/`、`/coverage.out`、`/.env` 和其他本地秘密文件；保留 `go.sum`、`.env.example` |
 
 只创建实际需要的业务模块、数据访问代码和基础设施配置。保留已有项目路径时，同步调整 Makefile 和 Dockerfile 构建入口。
 
-从全局技能初始化时，将当前 `SKILL.md` 和 `Makefile` 复制到项目的技能目录；已在目标目录时不重复复制。工程根 Makefile 是实际配置，技能内的 Makefile 只作模板，后续不自动覆盖根文件。
+从全局技能初始化时，将当前 `SKILL.md`、`references/api-spec.md` 和 `Makefile` 复制到项目的技能目录，保留相对目录结构；已在目标目录时不重复复制。工程根 Makefile 是实际配置，技能内的 Makefile 只作模板，后续不自动覆盖根文件。
 
 在根 `AGENTS.md` 中加入以下内容；已有文件只合并该约定，不重写其他指令：
 
 ```markdown
 ## Go 开发约定
 
-修改 Go 代码前，阅读 `.agents/skills/scratch-go/SKILL.md` 第 1、2、6 章；涉及配置或外部依赖时遵守第 3 章，涉及 HTTP 服务时遵守第 4 章。
+修改 Go 代码前，阅读 `.agents/skills/scratch-go/SKILL.md` 第 1、2、6 章；涉及配置或外部依赖时遵守第 3 章，涉及 HTTP 服务时遵守第 4 章及 `.agents/skills/scratch-go/references/api-spec.md`。
 初始化工程时执行第 5.1、5.2 节，服务部署遵守第 5.3 节。检查命令以工程根目录 Makefile 为准。
 ```
 
-README 汇总服务名、Makefile 用法，并提供配置、开发环境、部署、指标与告警的文档入口，具体内容按对应章节维护；工程规范引用本手册。接口文档记录实际业务 Reason、状态码及 Metadata 契约，通用错误响应格式引用第 4.1 节。
+README 汇总服务名、Makefile 用法，并提供配置、开发环境、部署、指标与告警的文档入口，具体内容按对应章节维护；工程规范引用本手册。接口文档记录实际业务字段、Reason、状态码及 Metadata 契约，通用响应与命名引用 [API 规范](references/api-spec.md)，错误转换与参数校验引用第 4.1 节。
 
-新建 HTTP 服务时，按第 4 章实现并增加 `GET /api/v1/ping`，返回 HTTP 200 和 `{"message":"pong","request_id":"<请求标识>"}`，作为初始可用性验证。
+新建 HTTP 服务时，按第 4 章实现并增加 `GET /api/v1/ping`，返回 HTTP 200 和 API 规范中的统一成功响应，`data` 为 `{"message":"pong"}`，作为初始可用性验证。
 
 ### 5.3 Docker Compose 部署
 
@@ -470,11 +461,12 @@ HTTP 服务按实际契约验证以下适用行为：
 
 | 必测行为 | 断言 |
 | --- | --- |
-| 实际接口（新建服务为 ping）与请求 ID | 状态、完整 JSON 结构、Content-Type、头/体 ID；合法 ID 保留，非法或缺失 ID 替换 |
+| 实际接口（新建服务为 ping）与请求 ID | 状态、API 规范的完整成功响应、Content-Type、头/体 ID；合法 ID 保留，非法或缺失 ID 替换 |
+| 响应命名、空值与列表分页 | JSON 字段递归使用 snake_case，覆盖 data 中的嵌套对象和数组元素；无数据成功及失败均保留 data:null；实际存在列表或分页时验证 items 空数组、总数、页码边界与非法分页参数 |
 | 请求解码 | 覆盖无效 JSON、类型错误、未知字段、尾随内容、必需请求体为空，以及实际支持的媒体类型和体积限制；按契约返回 400/413/415，不能提前写入其他响应或把取消、I/O 故障误报为参数错误 |
 | 参数校验 | 覆盖实际字段的必填、边界、格式和组合规则；区分缺失/null/零值，验证允许的 0/false 可通过；多个错误时首个错误稳定，状态、Reason、Message 和 Metadata 符合第 4.1.2 节，业务操作未被调用 |
 | 校验故障与业务边界 | 校验器配置/调用故障按内部错误处理并保留诊断；业务规则仍经业务入口验证 |
-| 业务及通用 4xx | 通过实际出口断言状态与 code 一致、reason/message 正确、metadata 有值时输出且空时省略、请求 ID 头体一致；覆盖实际存在的业务拒绝及 404/405，不产生故障 ERROR |
+| 业务及通用 4xx | 通过实际出口断言 API 规范的完整错误响应、状态与 code 一致、reason/message 正确、data 为 null、metadata 有值时输出且空时省略、请求 ID 头体一致；覆盖实际存在的业务拒绝及 404/405，不产生故障 ERROR |
 | 未识别的普通错误及无效应用错误 | 统一兜底为 500 和约定的 INTERNAL_ERROR 响应；生产边界只记一次终结 ERROR，保留诊断和关联信息 |
 | 显式应用错误和包装传播 | 包装后仍返回约定的响应字段，cause 不进入响应；最终 5xx 记一次 ERROR，不因自定义类型而忽略故障 |
 | 取消、超时与依赖不可用 | 分别覆盖客户端取消、请求有效但内部子操作取消、服务端超时及已识别的依赖不可用；后两者按约定返回 503，核对响应及日志，内部失败不得得到默认 200 |
