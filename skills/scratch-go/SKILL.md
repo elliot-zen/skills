@@ -95,6 +95,8 @@ Metadata 仅承载有界的补充数据，键、含义和边界由接口契约�
 
 明确文件、响应体、连接和事务的清理责任，覆盖成功、失败与取消路径，检查有意义的 `Close`、`Commit` 错误。
 
+**应用级关闭总时限：**HTTP 排空、后台任务退出和资源清理共用关闭总时限，各阶段不得重新计时延长总时限；超时后执行强制退出策略。
+
 ## 3. 配置与外部依赖
 
 ### 3.1 默认配置与环境变量
@@ -323,7 +325,7 @@ Gin 服务复用其 `go-playground/validator/v10` 校验能力，使用 `binding
 
 采用 `main → run → error`：`run` 负责运行与清理，`main` 负责最终失败日志和退出码。监听失败立即返回；不要用 `router.Run()` 代替生命周期管理。
 
-收到 SIGINT/SIGTERM 后，使用独立、受 `shutdown.timeout` 限制的上下文执行 `Shutdown`，允许在途请求完成。超时则调用 `Close` 并返回关闭失败，等待 `Serve` 所在的 goroutine 退出。关闭操作不使用已取消的信号上下文。正常 `http.ErrServerClosed` 不记 ERROR。
+收到 SIGINT/SIGTERM 后，创建独立、受 `shutdown.timeout` 限制的应用级关闭上下文，按第 2.4 节共用于 HTTP 排空、后台任务退出和资源清理；`Shutdown` 使用该上下文，允许在途请求在剩余时限内完成。超时则调用 `Close` 并返回关闭失败，等待 `Serve` 所在的 goroutine 退出；强制退出策略不得因后台任务或资源清理阻塞而无限等待。关闭操作不使用已取消的信号上下文。正常 `http.ErrServerClosed` 不记 ERROR。
 
 ### 4.4 运行指标与告警
 
