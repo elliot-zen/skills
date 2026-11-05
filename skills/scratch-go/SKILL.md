@@ -209,6 +209,10 @@ INFO 的 request、response 各保留前 1024 个 Unicode 字符，按码点计�
 
 交互日志按第 3.3.3 节记录每次尝试，中间失败不逐次记录终结 ERROR。重试或明确降级后最终成功不记整体失败 ERROR；最终失败由统一边界记录一次，并保留尝试次数和最终原因。
 
+### 3.4 数据库规范
+
+新增、修改或审查数据库表结构、迁移及数据访问代码时，阅读并遵守 [数据库规范](references/database-spec.md)。数据库规则统一维护在该引用文件中，后续规范继续在其中扩展。
+
 ## 4. HTTP 服务
 
 本章适用于 HTTP 服务，Gin 相关规则在使用 Gin 时适用；接口与实现约定用于新项目，既有项目按第 1 章保留兼容性。
@@ -375,14 +379,14 @@ Go 版本要求只维护在 `go.mod`：`go` 指令声明最低版本，`toolchai
 | `go.mod`、`go.sum` | 单模块及固定依赖 |
 | `Makefile` | 复制本技能同目录模板，作为工程执行入口 |
 | `Dockerfile`、`compose.yaml`、`.dockerignore` | 服务项目按第 5.3 节构建和部署 |
-| `.agents/skills/scratch-go/` | 保存本手册、`references/api-spec.md` 及 Makefile 模板，供项目内持续引用 |
+| `.agents/skills/scratch-go/` | 保存本手册、`references/` 下的规范及 Makefile 模板，供项目内持续引用 |
 | `AGENTS.md` | 后续开发约束入口 |
 | `README.md` | 环境、版本、配置、接口与 Makefile 目标说明 |
 | `.gitignore` | 忽略 `/bin/`、`/coverage.out`、`/.env` 和其他本地秘密文件；保留 `go.sum`、`.env.example` |
 
 只创建实际需要的业务模块、数据访问代码和基础设施配置。保留已有项目路径时，同步调整 Makefile 和 Dockerfile 构建入口。
 
-从全局技能初始化时，将当前 `SKILL.md`、`references/api-spec.md` 和 `Makefile` 复制到项目的技能目录，保留相对目录结构；已在目标目录时不重复复制。工程根 Makefile 是实际配置，技能内的 Makefile 只作模板，后续不自动覆盖根文件。
+从全局技能初始化时，将当前 `SKILL.md`、完整的 `references/` 目录和 `Makefile` 复制到项目的技能目录，保留相对目录结构；已在目标目录时不重复复制。工程根 Makefile 是实际配置，技能内的 Makefile 只作模板，后续不自动覆盖根文件。
 
 在根 `AGENTS.md` 中加入以下内容；已有文件只合并该约定，不重写其他指令：
 
@@ -390,6 +394,7 @@ Go 版本要求只维护在 `go.mod`：`go` 指令声明最低版本，`toolchai
 ## Go 开发约定
 
 修改 Go 代码前，阅读 `.agents/skills/scratch-go/SKILL.md` 第 1、2、6 章；涉及配置或外部依赖时遵守第 3 章，涉及 HTTP 服务时遵守第 4 章及 `.agents/skills/scratch-go/references/api-spec.md`。
+涉及数据库表结构、迁移或数据访问代码时，阅读并遵守 `.agents/skills/scratch-go/references/database-spec.md`。
 初始化工程时执行第 5.1、5.2 节，服务部署遵守第 5.3 节。检查命令以工程根目录 Makefile 为准。
 ```
 
