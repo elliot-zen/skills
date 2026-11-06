@@ -33,6 +33,7 @@ npx skills@latest add elliot-zen/skills
 - 开发指南：[skills/scratch-go/SKILL.md](skills/scratch-go/SKILL.md)
 - API 规范：[skills/scratch-go/references/api-spec.md](skills/scratch-go/references/api-spec.md)
 - 数据库规范：[skills/scratch-go/references/database-spec.md](skills/scratch-go/references/database-spec.md)
+- 日志规范：[skills/scratch-go/references/logging-spec.md](skills/scratch-go/references/logging-spec.md)
 - 工程 Makefile 模板：[skills/scratch-go/Makefile](skills/scratch-go/Makefile)
 
 本技能由 `elliot-zen/scratch-go` 迁入（源提交 `b6a70e1da2379580708916aa49c87ba53eddb18d`），技能名称为 `scratch-go`。
