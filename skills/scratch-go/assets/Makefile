@@ -5,15 +5,15 @@ SHELL := /bin/sh
 GO ?= go
 GOFMT ?= $(shell "$(GO)" env GOROOT)/bin/gofmt
 GO_TEST_FLAGS ?= -count=1 -v -timeout=5m -json
-# Replace this default with the project's primary service name during initialization.
+# Set this to the project's primary service name.
 SERVICE ?= service
 VERSION ?= dev
 
-.PHONY: build run dev fmt test coverage
+.PHONY: build run dev fmt test lint coverage
 
 # Shared prerequisite checks, expanded only when a public target runs.
 define guard
-	@test -f go.mod || { printf '%s\n' 'Run from the initialized Go module root.' >&2; exit 1; }
+	@test -f go.mod || { printf '%s\n' 'Run from the Go module root.' >&2; exit 1; }
 	@"$(GO)" env GOVERSION > /dev/null
 endef
 
@@ -37,6 +37,10 @@ dev: build
 test:
 	$(guard)
 	"$(GO)" test $(GO_TEST_FLAGS) ./...
+
+lint:
+	$(guard)
+	"$(GO)" vet ./...
 
 coverage:
 	$(guard)

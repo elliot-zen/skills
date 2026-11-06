@@ -1,6 +1,6 @@
 # skills
 
-面向 AI Agent 的技能库。每个技能是 `skills/` 下的一个自包含目录，以 `SKILL.md` 为入口，可附带 `references/` 与 `templates/`。
+面向 AI Agent 的技能库。每个技能是 `skills/` 下的一个自包含目录，以 `SKILL.md` 为入口，可附带 `references/` 与 `assets/`。
 
 ## 安装
 
@@ -28,12 +28,15 @@ npx skills@latest add elliot-zen/skills
 
 ### scratch-go
 
-指导 Go 后端项目的初始化、开发、修复、重构与审查。手册按工作流程、通用工程规范、配置与外部依赖、HTTP 服务、初始化与部署、验证与交付六章组织，配套提供 Makefile 模板。
+指导 Go 后端项目的开发、修复、重构与审查。`SKILL.md` 定义任务导航、Makefile 命令用法与验收流程；工程模式、错误处理、日志、API 和数据库规范按需读取。错误处理采用下层传播、最终边界记录，HTTP 层显式映射安全响应。
 
 - 开发指南：[skills/scratch-go/SKILL.md](skills/scratch-go/SKILL.md)
+- Go 工程模式：[skills/scratch-go/references/go-patterns.md](skills/scratch-go/references/go-patterns.md)
+- Go 编码规范：[skills/scratch-go/references/go-idioms.md](skills/scratch-go/references/go-idioms.md)，根据用户提供的 ECC `golang-patterns` 整理
+- 错误处理：[skills/scratch-go/references/error.md](skills/scratch-go/references/error.md)
 - API 规范：[skills/scratch-go/references/api-spec.md](skills/scratch-go/references/api-spec.md)
 - 数据库规范：[skills/scratch-go/references/database-spec.md](skills/scratch-go/references/database-spec.md)
-- 日志规范：[skills/scratch-go/references/logging-spec.md](skills/scratch-go/references/logging-spec.md)
-- 工程 Makefile 模板：[skills/scratch-go/Makefile](skills/scratch-go/Makefile)
+- 日志规范：[skills/scratch-go/references/logging.md](skills/scratch-go/references/logging.md)
+- 工程 Makefile 模板：[skills/scratch-go/assets/Makefile](skills/scratch-go/assets/Makefile)
 
 本技能由 `elliot-zen/scratch-go` 迁入（源提交 `b6a70e1da2379580708916aa49c87ba53eddb18d`），技能名称为 `scratch-go`。
