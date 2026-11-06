@@ -9,7 +9,7 @@ GO_TEST_FLAGS ?= -count=1 -v -timeout=5m -json
 SERVICE ?= service
 VERSION ?= dev
 
-.PHONY: build run dev fmt test lint coverage
+.PHONY: build run fmt test lint coverage
 
 # Shared prerequisite checks, expanded only when a public target runs.
 define guard
@@ -23,15 +23,13 @@ build:
 	"$(GO)" build -trimpath -ldflags '-X main.version=$(VERSION)' -o 'bin/$(SERVICE)' './cmd/$(SERVICE)'
 
 run: build
-	'./bin/$(SERVICE)'
-
-dev: build
 	@set -e; \
 	if [ -f .env ]; then \
 	  set -a; \
 	  . ./.env; \
 	  set +a; \
 	fi; \
+	export GIN_RELEASE=false; \
 	exec './bin/$(SERVICE)'
 
 test:

@@ -35,21 +35,20 @@ description: 指导 Go 后端项目的开发、修复、重构与审查，提供
 | 命令 | 用途与行为 |
 | --- | --- |
 | `make build` | 构建 `cmd/$(SERVICE)` 到 `bin/$(SERVICE)`，注入 `main.version`；发布时指定可追溯的 `VERSION` |
-| `make run` | 构建后前台运行，不加载 `.env` |
-| `make dev` | 构建后通过 shell 加载根目录 `.env` 并以前台 exec 运行；具体覆盖规则见 Go 工程模式第 2.2 节 |
+| `make run` | 构建后通过 shell 加载根目录 `.env`，设置 `GIN_RELEASE=false` 并以前台 exec 运行；具体覆盖规则见 Go 工程模式第 2.2 节 |
 | `make fmt` | 使用所选 Go 工具链的 gofmt 修复源码格式，跳过 `.git`、`.tools`、`vendor` |
 | `make test` | 运行整个模块测试，默认禁用测试结果缓存；也是 Makefile 默认目标 |
 | `make lint` | 执行 `go vet ./...` 静态检查，失败返回非零；不修改源码、不安装额外工具 |
 | `make coverage` | 运行整个模块测试，生成 `coverage.out`，输出函数级及总覆盖率 |
 
-`build/run/dev` 默认使用 `SERVICE` 指定的服务，可通过 `make build SERVICE=orders-worker` 等方式切换。`VERSION` 开发默认 `dev`，发布示例为 `make build VERSION=v1.2.3`。Go 版本约束只维护在 `go.mod`。
+`build/run` 默认使用 `SERVICE` 指定的服务，可通过 `make build SERVICE=orders-worker` 等方式切换。`VERSION` 开发默认 `dev`，发布示例为 `make build VERSION=v1.2.3`。Go 版本约束只维护在 `go.mod`。
 
 `test` 和 `coverage` 共用 `GO_TEST_FLAGS ?= -count=1 -v -timeout=5m -json`，默认输出详细 JSON 测试事件，每个包超时 5 分钟。可覆盖，例如：
 
 ```sh
 make test GO_TEST_FLAGS='-count=1 -timeout=5m -run TestCreateOrder'
 make test GO_TEST_FLAGS='-count=1 -timeout=5m -race'
-HTTP_ADDR=:8081 LOG_LEVEL=debug make run
+make run
 ```
 
 `coverage` 使用 atomic 模式，不设置统一覆盖率门槛；用 `go tool cover -html=coverage.out` 定位未覆盖路径，覆盖率不能替代行为断言。`fmt` 只格式化，`lint` 只静态检查，两者互不代替；`coverage` 已包含测试，同次验收无需再执行等价的 `test`。

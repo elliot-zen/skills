@@ -21,6 +21,7 @@
 | YAML 字段 | 环境变量 | 默认值 |
 | --- | --- | --- |
 | `http.addr` | `HTTP_ADDR` | `:8080` |
+| `gin.release` | `GIN_RELEASE` | `true` |
 | `shutdown.timeout` | `SHUTDOWN_TIMEOUT` | `10s` |
 | `log.level` | `LOG_LEVEL` | `info` |
 
@@ -34,7 +35,9 @@ Worker/CLI 只保留适用项。环境变量采用大写下划线命名，每个
 
 ### 2.2 开发环境
 
-应用不加载 `.env`。`make dev` 构建后通过 POSIX shell 的 `.` 加载根目录 `.env` 并导出变量；文件不存在时使用继承环境，加载失败时不启动。文件中的赋值覆盖继承环境，未赋值项保留原值。`make run` 不读取 `.env`。
+应用不加载 `.env`。`make run` 构建后通过 POSIX shell 的 `.` 加载根目录 `.env` 并导出变量；文件不存在时使用继承环境，加载失败时不启动。文件中的赋值覆盖继承环境，未赋值项保留原值。
+
+`make run` 在加载 `.env` 后固定设置 `GIN_RELEASE=false`，覆盖继承环境和 `.env` 中的同名值，使 Gin 使用 debug 模式。
 
 `.env` 使用 shell 赋值语法，特殊字符用单引号保护，不写命令或命令替换；不用于设置 `SERVICE`、`VERSION` 或构建工具参数。示例维护在 `.env.example`，实际 `.env` 加入 `.gitignore`。
 
@@ -48,7 +51,7 @@ Worker/CLI 只保留适用项。环境变量采用大写下划线命名，每个
 
 ### 3.1 路由与适配
 
-- 使用 `gin.New()`，生产使用 release 模式，关闭调试输出；不暴露故障、panic 或延时调试接口。
+- 使用 `gin.New()`；创建引擎前根据 `gin.release` 显式调用 `gin.SetMode`：`true` 使用 `gin.ReleaseMode`，`false` 使用 `gin.DebugMode`。生产使用 release 模式，关闭调试输出；不暴露故障、panic 或延时调试接口。
 - 路径不存在返回统一 404；路径存在但请求方法不支持时返回统一 405，并携带 `Allow` 头。
 - `internal/httpapi/error_handler.go` 提供统一错误出口，业务映射放在所属 HTTP 适配代码中，遵守 [错误处理](error.md#4-对外错误映射)和 [API 规范](api-spec.md)。出口保存失败结果，不记录日志。
 - 复用 Gin 的 `go-playground/validator/v10`，常规校验使用 `binding` 标签，组合规则使用结构级或显式校验；自定义规则和字段名映射在启动时注册。
