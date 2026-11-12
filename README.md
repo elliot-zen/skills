@@ -36,6 +36,7 @@ npx skills@latest add elliot-zen/skills
 - 错误处理：[skills/scratch-go/references/error.md](skills/scratch-go/references/error.md)
 - API 规范：[skills/scratch-go/references/api-spec.md](skills/scratch-go/references/api-spec.md)
 - 数据库规范：[skills/scratch-go/references/database-spec.md](skills/scratch-go/references/database-spec.md)
+- MySQL/MariaDB 模式：[skills/scratch-go/references/mysql-patterns.md](skills/scratch-go/references/mysql-patterns.md)，根据用户提供的 ECC `mysql-patterns` 整理
 - 日志规范：[skills/scratch-go/references/logging.md](skills/scratch-go/references/logging.md)
 - 工程 Makefile 模板：[skills/scratch-go/assets/Makefile](skills/scratch-go/assets/Makefile)
 

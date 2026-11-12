@@ -25,6 +25,7 @@ description: 指导 Go 后端项目的开发、修复、重构与审查，提供
 | 日志输出、请求完成记录、第三方交互或脱敏 | [日志规范](references/logging.md)；涉及故障记录责任时同时读错误处理 |
 | HTTP API 开发或审查 | [API 规范](references/api-spec.md)及 Go 工程模式第 3 章；涉及失败路径时读错误处理与日志规范 |
 | 数据库表结构、迁移或数据访问 | [数据库规范](references/database-spec.md)；外部调用和错误转换按相关专题执行 |
+| MySQL/MariaDB 表与索引设计、迁移、慢查询、事务锁、连接池或复制延迟 | 数据库规范及 [MySQL 模式](references/mysql-patterns.md)的相关章节 |
 
 各专题包含自身验证要求；公共命令与执行时机只在本文件定义。
 
