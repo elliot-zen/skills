@@ -1,6 +1,6 @@
 ---
 name: scratch-go
-description: 指导 Go 后端项目的开发、修复、重构与审查，提供项目结构、错误处理、日志、HTTP API、数据库及构建验证约定。
+description: 指导 Go 后端项目的初始化、开发、修复、重构与审查，提供 Go 版本、Dockerfile、项目结构、错误处理、日志、HTTP API、数据库及构建验证约定。
 ---
 
 # Go 后端工程开发指南
@@ -13,12 +13,15 @@ description: 指导 Go 后端项目的开发、修复、重构与审查，提供
 
 开始工作前读取项目的 `AGENTS.md`、相关源码、测试、依赖与 Makefile，确认实际版本、用户要求和未提交修改。保留与当前任务无关的文件和用户修改。实现调整时同步受影响的契约、文档和测试。
 
+初始化项目时，先按[Go 版本与容器构建](references/build.md)询问用户使用的 Docker 构建 Go 版本，提供 `1.27.3` 作为默认选项；等待用户选择后生成 Dockerfile。用户已在当前任务明确指定版本时直接采用。本地 Go 版本允许与 Dockerfile 不同，两者均需满足 `go.mod` 的最低版本要求。
+
 按下表读取任务涉及的专题，完成实现和对应行为验证，再执行第 4 节要求的工程检查。每条规则由一个专题维护，其他文件只引用；不默认加载全部参考文档。
 
 ## 2. 专题导航
 
 | 任务 | 阅读内容 |
 | --- | --- |
+| 初始化项目、选择 Go 版本、编写或修改 Dockerfile、容器构建 | [Go 版本与容器构建](references/build.md)，按需使用其中链接的 Dockerfile 与 .dockerignore 模板 |
 | Go 类型、接口、代码表达、并发模式或内存复用的编写与审查 | [Go 编码规范](references/go-idioms.md)的相关章节 |
 | 包组织、配置、外部依赖、Context、并发或服务运行 | [Go 工程模式](references/go-patterns.md)的相关章节 |
 | 创建、包装、转换或处理错误，以及 panic 恢复 | [错误处理](references/error.md) |
@@ -42,7 +45,7 @@ description: 指导 Go 后端项目的开发、修复、重构与审查，提供
 | `make lint` | 执行 `go vet ./...` 静态检查，失败返回非零；不修改源码、不安装额外工具 |
 | `make coverage` | 运行整个模块测试，生成 `coverage.out`，输出函数级及总覆盖率 |
 
-`build/run` 默认使用 `SERVICE` 指定的服务，可通过 `make build SERVICE=orders-worker` 等方式切换。`VERSION` 开发默认 `dev`，发布示例为 `make build VERSION=v1.2.3`。Go 版本约束只维护在 `go.mod`。
+`build/run` 默认使用 `SERVICE` 指定的服务，可通过 `make build SERVICE=orders-worker` 等方式切换。`VERSION` 开发默认 `dev`，发布示例为 `make build VERSION=v1.2.3`。`go.mod` 定义最低 Go 版本；本地工具链与 Docker 构建版本的选择见 Go 版本与容器构建。
 
 `test` 和 `coverage` 共用 `GO_TEST_FLAGS ?= -count=1 -v -timeout=5m -json`，默认输出详细 JSON 测试事件，每个包超时 5 分钟。可覆盖，例如：
 
@@ -63,5 +66,6 @@ make run
 | Go 开发、修复、重构 | `make fmt`、`make lint` 及相关测试；需要覆盖率时以 `make coverage` 替代等价测试 |
 | 错误、日志或并发修改 | 上述检查，加上对应专题的失败、取消、重复记录或资源清理反例验证 |
 | 配置或服务生命周期修改 | 适用检查，加上配置覆盖、非法配置启动失败、监听与关闭行为验证 |
+| 初始化项目、Go 构建版本或 Dockerfile 修改 | Go 版本与容器构建中的镜像构建及运行验证；涉及 Go 源码时同时执行对应检查 |
 
 缺少工具或环境能力时标明未执行项及原因，不绕过或降级检查。交付记录源码及工具版本、执行命令、实际结果、运行入口和必要偏离；复核职责边界、抽象必要性及诊断信息是否足够。

@@ -28,9 +28,10 @@ npx skills@latest add elliot-zen/skills
 
 ### scratch-go
 
-指导 Go 后端项目的开发、修复、重构与审查。`SKILL.md` 定义任务导航、Makefile 命令用法与验收流程；工程模式、错误处理、日志、API 和数据库规范按需读取。错误处理采用下层传播、最终边界记录，HTTP 层显式映射安全响应。
+指导 Go 后端项目的初始化、开发、修复、重构与审查。初始化时询问 Docker 构建 Go 版本，默认选项为 `1.27.3`；本地 Go 版本允许不同，但均需满足 `go.mod` 的最低要求。Dockerfile 默认使用 Alpine 构建、scratch 运行的多阶段结构，运行身份统一为 `UID/GID 1000:1000`。`SKILL.md` 定义任务导航、Makefile 命令用法与验收流程；各专题按需读取。错误处理采用下层传播、最终边界记录，HTTP 层显式映射安全响应。
 
 - 开发指南：[skills/scratch-go/SKILL.md](skills/scratch-go/SKILL.md)
+- Go 版本与容器构建：[skills/scratch-go/references/build.md](skills/scratch-go/references/build.md)
 - Go 工程模式：[skills/scratch-go/references/go-patterns.md](skills/scratch-go/references/go-patterns.md)
 - Go 编码规范：[skills/scratch-go/references/go-idioms.md](skills/scratch-go/references/go-idioms.md)，根据用户提供的 ECC `golang-patterns` 整理
 - 错误处理：[skills/scratch-go/references/error.md](skills/scratch-go/references/error.md)
@@ -39,5 +40,6 @@ npx skills@latest add elliot-zen/skills
 - MySQL/MariaDB 模式：[skills/scratch-go/references/mysql-patterns.md](skills/scratch-go/references/mysql-patterns.md)，根据用户提供的 ECC `mysql-patterns` 整理
 - 日志规范：[skills/scratch-go/references/logging.md](skills/scratch-go/references/logging.md)
 - 工程 Makefile 模板：[skills/scratch-go/assets/Makefile](skills/scratch-go/assets/Makefile)
+- 容器构建模板：[Dockerfile](skills/scratch-go/assets/Dockerfile)、[.dockerignore](skills/scratch-go/assets/.dockerignore)
 
 本技能由 `elliot-zen/scratch-go` 迁入（源提交 `b6a70e1da2379580708916aa49c87ba53eddb18d`），技能名称为 `scratch-go`。
